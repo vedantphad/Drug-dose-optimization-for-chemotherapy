@@ -1,0 +1,460 @@
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+   1  Parameters
+   2      s influx rate (0 < s < 0.5) /0.33/,
+   3      rho rate of immune response per capita (0 ≤ ρ ≤ 1) /0.01/,
+   4      alpha threshold rate (0 ≤ α ≤ 0.5) /0.3/,
+   5      r1 logistic growth /1.5/
+   6      r2 /1/,
+   7      a1 cell death response coefficients a2 ≥ a1 ≥ a3 /0.2/,
+   8      a2 /0.3/,
+   9      a3 /0.1/,
+  10      b1 carrying capacities per capita /1/,
+  11      b2 /1.5/,
+  12      c1 competition terms Tumor cells and normal cells vie for space and resources /1/,
+  13      c2 /0.5/,
+  14      c3 /1/,
+  15      c4 /1/,
+  16      d1 Mortality rate /1.2/,
+  17   
+  18      N0 Initial Number of natural cells /0.9/,
+  19      T0 Initial Number of tumer cells /0.25/,
+  20      I0 Initial Number of immune cells /0.25/;
+  21   
+  22  Variables N,I,T,t,Z1,Z2;
+  23  Positive Variable u;
+  24   
+  25  ***Equations***
+  26  Equations eq1,eq2,eq3,eq4,eq5,eq6;
+  27   
+  28  eq1.. N =e= (((r2-c4*T)/2*b2*r2)+sqrt((a3*u/r2*b2)-((r2-c4*T)/b2*r2)**2)*tan(-r2*b2*t+arctan((N0-((r2-c4*T)/2*b2*r2))/sqrt((a3*u/r2*b2)-((r2-c4*T)/b2*r2)**2))))/sqrt((a3*u/r2*b2)-((r2-c4*T)/b2*r2)**2);
+  29  eq2.. T =e= ((r1*c2*I-c3*N)+2*r1*b1*tan(-r1*b1*t+arctan((T0-(r1*c2*I-c3*N))/2*r1*b1)))/2*r1*b1;
+  30  eq3.. I =e= (exp(log(I0+((s-a1*u)/((rho*T/alpha+T)-c1*T-d1)))-t/((rho*T/alpha+T)-c1*T-d1))-(s-a1*u))/((rho*T/alpha+T)-c1*T-d1);
+  31  eq4.. u =e= r1*b1*(((r1-c2*I-c3*N)/2*r1*b1)**2+((T-(r1*c2*I-c3*N))**2)/(tan(-r1*b1*t+arctan(((T0-(r1*c2*I-c3*N))**2)/2*r1*b1)))**2)/a2;
+  32  eq5.. Z1 =e= T;
+  33  eq6.. Z2 =e= u;
+  34   
+  35  ***Boundary Conditions***
+  36  N.lo = 0.75;
+  37  T.lo = 0;
+  38  u.lo = 5;
+  39  u.up = 75;
+  40  I.lo=0;
+  41  t.lo=0;
+  42   
+  43   
+  44   
+  45  model drug_dose /all/;
+  46  model Tumor /all/;
+  47   
+  48  solve drug_dose using MINLP minimizing Z2;
+  49  solve Tumor using NLP minimizing Z1;
+  50   
+  51  display z1.l,z2.l;
+
+
+COMPILATION TIME     =        0.000 SECONDS      2 MB  45.2.0 e4d2ee31 WEX-WEI
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE drug_dose Using MINLP From line 48
+
+
+---- eq1  =E=  
+
+eq1..  N + (3.97868910650171)*T + (0.399639582176708)*u =E= 0 ; (LHS = -0.878161260719923, INFES = 0.878161260719923 ****)
+     
+
+---- eq2  =E=  
+
+eq2..  - (0.9375)*N + (0.703125)*I + (6.2734375)*T =E= 0 ; (LHS = -1.125, INFES = 1.125 ****)
+     
+
+---- eq3  =E=  
+
+eq3..  I + (0.608487654320988)*T + (0.305555555555556)*u =E= 0 ; (LHS = 1.23194444444444, INFES = 1.23194444444444 ****)
+     
+
+---- eq4  =E=  
+
+eq4..  (10.8854166666667)*N - (2.890625)*I - (44.5833333333333)*T + u =E= 0 ; (LHS = -1.58203125, INFES = 1.58203125 ****)
+     
+
+---- eq5  =E=  
+
+eq5..  - T + Z1 =E= 0 ; (LHS = 0)
+     
+
+---- eq6  =E=  
+
+eq6..  Z2 - u =E= 0 ; (LHS = -5, INFES = 5 ****)
+     
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE drug_dose Using MINLP From line 48
+
+
+---- N  
+
+N
+                (.LO, .L, .UP, .M = 0.75, 0.75, +INF, 0)
+        1       eq1
+      (-0.9375) eq2
+      (10.8854) eq4
+        0       (OLD LEVEL ****)
+
+
+---- I  
+
+I
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       (0.7031) eq2
+        1       eq3
+      (-2.8906) eq4
+
+
+---- T  
+
+T
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       (3.9787) eq1
+       (6.2734) eq2
+       (0.6085) eq3
+     (-44.5833) eq4
+       -1       eq5
+
+
+---- Z1  
+
+Z1
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       eq5
+
+
+---- Z2  
+
+Z2
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       eq6
+
+
+---- u  
+
+u
+                (.LO, .L, .UP, .M = 5, 5, 75, 0)
+       (0.3996) eq1
+       (0.3056) eq3
+        1       eq4
+       -1       eq6
+        0       (OLD LEVEL ****)
+
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE drug_dose Using MINLP From line 48
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [        NA,        NA] - Zero values observed as well
+Bound     [min, max] : [ 7.500E-01, 7.500E+01] - Zero values observed as well
+Matrix    [min, max] : [ 3.056E-01, 4.458E+01]
+
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE drug_dose Using MINLP From line 48
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           6     SINGLE EQUATIONS            6
+BLOCKS OF VARIABLES           6     SINGLE VARIABLES            6  2 projected
+NON ZERO ELEMENTS            17     NON LINEAR N-Z             10
+CODE LENGTH                 122     CONSTANT POOL              34
+
+
+GENERATION TIME      =        0.110 SECONDS      3 MB  45.2.0 e4d2ee31 WEX-WEI
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE drug_dose Using MINLP From line 48
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   drug_dose           OBJECTIVE  Z2
+     TYPE    MINLP               DIRECTION  MINIMIZE
+     SOLVER  DICOPT              FROM LINE  48
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      5 Locally Infeasible
+**** OBJECTIVE VALUE                5.0000
+
+ RESOURCE USAGE, LIMIT          0.093 10000000000.000
+ ITERATION COUNT, LIMIT         6    2147483647
+ EVALUATION ERRORS              0             0
+-------------------------------------------------------------------------------
+Dicopt 2         45.2.0 e4d2ee31 Oct 30, 2023          WEI x86 64bit/MS Window
+-------------------------------------------------------------------------------
+*** This solver runs with a demo license. No commercial use.
+--- *** This solver runs with a demo license. No commercial use.
+ 
+ 
+    C O N O P T 3   version 3.17O
+    Copyright (C)   ARKI Consulting and Development A/S
+                    Bagsvaerdvej 246 A
+                    DK-2880 Bagsvaerd, Denmark
+ 
+ 
+ ** Warning **  The value of LFITER is out of range.
+                LFITER is decreased from 2147483647 to 1000000000.
+ 
+                   Pre-triangular equations:   0
+                   Post-triangular equations:  2
+ 
+ 
+ ** Infeasible solution. There are no superbasic variables.
+ 
+ 
+ CONOPT time Total                            0.002 seconds
+   of which: Function evaluations             0.000 =  0.0%
+             1st Derivative evaluations       0.000 =  0.0%
+ 
+--- DICOPT: No discrete variables found
+--- DICOPT: Returning NLP solution
+
+      The model does not contain any discrete variables.
+      The NLP solution is returned to GAMS.
+      Advice: use an NLP solver for this model.
+
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU eq1                 .              .              .            -0.2109      
+---- EQU eq2                 .            -1.0060          .             1.0000 INFES
+---- EQU eq3                 .             1.2838          .            -1.0000 INFES
+---- EQU eq4                 .              .              .             0.1550      
+---- EQU eq5                 .              .              .             EPS         
+---- EQU eq6                 .              .              .             EPS         
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR N                  0.7500         1.3358        +INF             .          
+---- VAR I                   .              .            +INF            0.9792      
+---- VAR T                   .             0.0821        +INF             .          
+---- VAR Z1                -INF            0.0821        +INF             .          
+---- VAR Z2                -INF            5.0000        +INF             .          
+---- VAR u                  5.0000         5.0000        75.0000         0.2223      
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             2 INFEASIBLE (INFES)
+                    SUM          2.2898
+                    MAX          1.2838
+                    MEAN         1.1449
+                             0  UNBOUNDED
+                             0     ERRORS
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 7
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE Tumor Using NLP From line 49
+
+
+---- eq1  =E=  
+
+eq1..  N + (3.21930719388409)*T + (0.288747718304637)*u =E= 0 ; (LHS = 0)
+     
+
+---- eq2  =E=  
+
+eq2..  - (0.551857461492031)*N + (0.413893096119023)*I + (7.28681696080418)*T =E= 0 ; (LHS = -1.00596321784845, INFES = 1.00596321784845 ****)
+     
+
+---- eq3  =E=  
+
+eq3..  I + (0.655951343790944)*T + (0.316474898852697)*u =E= 0 ; (LHS = 1.2838207062532, INFES = 1.2838207062532 ****)
+     
+
+---- eq4  =E=  
+
+eq4..  (4.92013280106365)*N - (2.53558073628962)*I - (38.3916122742917)*T + u =E= 0 ; (LHS = 0)
+     
+
+---- eq5  =E=  
+
+eq5..  - T + Z1 =E= 0 ; (LHS = 0)
+     
+
+---- eq6  =E=  
+
+eq6..  Z2 - u =E= 0 ; (LHS = 0)
+     
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 8
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE Tumor Using NLP From line 49
+
+
+---- N  
+
+N
+                (.LO, .L, .UP, .M = 0.75, 1.33580176149218, +INF, 0)
+        1       eq1
+      (-0.5519) eq2
+       (4.9201) eq4
+
+
+---- I  
+
+I
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0.979199273370756)
+       (0.4139) eq2
+        1       eq3
+      (-2.5356) eq4
+
+
+---- T  
+
+T
+                (.LO, .L, .UP, .M = 0, 0.0820958517444825, +INF, 0)
+       (3.2193) eq1
+       (7.2868) eq2
+       (0.656)  eq3
+     (-38.3916) eq4
+       -1       eq5
+
+
+---- Z1  
+
+Z1
+                (.LO, .L, .UP, .M = -INF, 0.0820958517444825, +INF, 0)
+        1       eq5
+
+
+---- Z2  
+
+Z2
+                (.LO, .L, .UP, .M = -INF, 5, +INF, 0)
+        1       eq6
+
+
+---- u  
+
+u
+                (.LO, .L, .UP, .M = 5, 5, 75, 0.222345103622881)
+       (0.2887) eq1
+       (0.3165) eq3
+        1       eq4
+       -1       eq6
+
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 9
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE Tumor Using NLP From line 49
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [        NA,        NA] - Zero values observed as well
+Bound     [min, max] : [ 7.500E-01, 7.500E+01] - Zero values observed as well
+Matrix    [min, max] : [ 2.887E-01, 3.839E+01]
+
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 10
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE Tumor Using NLP From line 49
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           6     SINGLE EQUATIONS            6
+BLOCKS OF VARIABLES           6     SINGLE VARIABLES            6
+NON ZERO ELEMENTS            17     NON LINEAR N-Z             10
+CODE LENGTH                 122     CONSTANT POOL              34
+
+
+GENERATION TIME      =        0.000 SECONDS      3 MB  45.2.0 e4d2ee31 WEX-WEI
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 11
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE Tumor Using NLP From line 49
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   Tumor               OBJECTIVE  Z1
+     TYPE    NLP                 DIRECTION  MINIMIZE
+     SOLVER  CONOPT              FROM LINE  49
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      5 Locally Infeasible
+**** OBJECTIVE VALUE                0.0821
+
+ RESOURCE USAGE, LIMIT          0.015 10000000000.000
+ ITERATION COUNT, LIMIT         5    2147483647
+ EVALUATION ERRORS              0             0
+--- *** This solver runs with a demo license. No commercial use.
+ 
+ 
+    C O N O P T 3   version 3.17O
+    Copyright (C)   ARKI Consulting and Development A/S
+                    Bagsvaerdvej 246 A
+                    DK-2880 Bagsvaerd, Denmark
+ 
+ 
+ ** Warning **  The value of LFITER is out of range.
+                LFITER is decreased from 2147483647 to 1000000000.
+ 
+                   Pre-triangular equations:   0
+                   Post-triangular equations:  2
+ 
+ 
+ ** Infeasible solution. There are no superbasic variables.
+ 
+ 
+ CONOPT time Total                            0.002 seconds
+   of which: Function evaluations             0.000 =  0.0%
+             1st Derivative evaluations       0.000 =  0.0%
+ 
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU eq1                 .              .              .            -0.2109      
+---- EQU eq2                 .            -1.0060          .             1.0000 INFES
+---- EQU eq3                 .             1.2838          .            -1.0000 INFES
+---- EQU eq4                 .              .              .             0.1550      
+---- EQU eq5                 .              .              .             EPS         
+---- EQU eq6                 .              .              .             EPS         
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR N                  0.7500         1.3358        +INF             .          
+---- VAR I                   .              .            +INF            0.9792      
+---- VAR T                   .             0.0821        +INF             .          
+---- VAR Z1                -INF            0.0821        +INF             .          
+---- VAR Z2                -INF            5.0000        +INF             .          
+---- VAR u                  5.0000         5.0000        75.0000         0.2223      
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             2 INFEASIBLE (INFES)
+                    SUM          2.2898
+                    MAX          1.2838
+                    MEAN         1.1449
+                             0  UNBOUNDED
+                             0     ERRORS
+GAMS 45.2.0  e4d2ee31 Oct 30, 2023          WEX-WEI x86 64bit/MS Windows - 11/30/23 05:40:48 Page 12
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+E x e c u t i o n
+
+
+----     51 VARIABLE Z1.L                  =        0.082  
+            VARIABLE Z2.L                  =        5.000  
+
+
+EXECUTION TIME       =        0.610 SECONDS      3 MB  45.2.0 e4d2ee31 WEX-WEI
+
+
+USER: GAMS Demo license for Arijit Mohanta           G231027|0002CO-GEN
+      Indian Institute of Technology Guwahati, India           DL099762
+
+
+**** FILE SUMMARY
+
+Input      C:\Users\ariji\OneDrive\Documents\GAMS\Studio\workspace\Chemotherapy_optimization.gms
+Output     C:\Users\ariji\OneDrive\Documents\GAMS\Studio\workspace\Chemotherapy_optimization.lst
